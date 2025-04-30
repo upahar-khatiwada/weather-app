@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:weather_app/main.dart';
 
 class MyButtons extends StatelessWidget {
   final String text;
