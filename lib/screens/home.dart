@@ -5,6 +5,7 @@ import 'package:weather_app/services/weather_model.dart';
 import 'package:weather_app/services/locator.dart';
 import 'package:lottie/lottie.dart';
 import 'package:weather_app/services/Capitalizer.dart';
+import 'package:weather_app/services/animation_selector.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -93,11 +94,15 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 450),
+                    Lottie.asset(getJSON(w!.main)),
+                    // Lottie.asset('assets/mist.json'),
+                    const SizedBox(height: 10),
                     Container(
-                      child: Text(
-                        '${w!.temp} °C',
-                        style: TextStyle(color: Colors.white, fontSize: 50),
+                      child: Center(
+                        child: Text(
+                          '${w!.temp} °C',
+                          style: TextStyle(color: Colors.white, fontSize: 40),
+                        ),
                       ),
                     ),
                   ],
