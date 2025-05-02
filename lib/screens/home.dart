@@ -4,6 +4,7 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:weather_app/services/weather_model.dart';
 import 'package:weather_app/services/locator.dart';
 import 'package:lottie/lottie.dart';
+import 'package:weather_app/services/Capitalizer.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -63,9 +64,42 @@ class _HomeState extends State<Home> {
                 ? const CircularProgressIndicator()
                 : Column(
                   children: [
-                    Text(w!.cityName, style: TextStyle(color: Colors.white)),
-                    const SizedBox(height: 20),
-                    Text(w!.temp, style: TextStyle(color: Colors.white)),
+                    SizedBox(height: 30),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/map');
+                      },
+                      label: Text(
+                        'Edit Location',
+                        style: TextStyle(color: Colors.black, fontSize: 18),
+                      ),
+                      icon: Icon(Icons.edit_location, size: 20),
+                      style: ButtonStyle(
+                        foregroundColor: WidgetStateProperty.all(Colors.black),
+                        backgroundColor: WidgetStateProperty.all(Colors.white),
+                        // padding: WidgetStateProperty.all(EdgeInsets.all(12)),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 10),
+                      child: Center(
+                        child: Text(
+                          capitalize(w!.cityName),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 30,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 450),
+                    Container(
+                      child: Text(
+                        '${w!.temp} °C',
+                        style: TextStyle(color: Colors.white, fontSize: 50),
+                      ),
+                    ),
                   ],
                 ),
       ),
