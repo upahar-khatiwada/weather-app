@@ -15,6 +15,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  // w is an object to get the weather data
   Weather? w;
 
   @override
@@ -59,10 +60,13 @@ class _HomeState extends State<Home> {
         backgroundColor: HexColor('#5f6464'),
       ),
       backgroundColor: HexColor('#1d1e1e'),
+      // backgroundColor: Colors.white,
       body: SafeArea(
         child:
             w == null
-                ? const CircularProgressIndicator()
+                ? Center(
+                  child: const CircularProgressIndicator(color: Colors.white),
+                )
                 : Column(
                   children: [
                     SizedBox(height: 30),
@@ -97,13 +101,133 @@ class _HomeState extends State<Home> {
                     Lottie.asset(getJSON(w!.main)),
                     // Lottie.asset('assets/mist.json'),
                     const SizedBox(height: 10),
-                    Container(
-                      child: Center(
-                        child: Text(
-                          '${w!.temp} °C',
-                          style: TextStyle(color: Colors.white, fontSize: 40),
-                        ),
+                    Center(
+                      child: Text(
+                        '${w!.temp} °C',
+                        style: TextStyle(color: Colors.white, fontSize: 40),
                       ),
+                    ),
+                    SizedBox(height: 30),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // Sunrise Container
+                        Column(
+                          children: [
+                            Container(
+                              width: 150,
+                              height: 50,
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: HexColor('#5f6464'),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.wb_sunny,
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    w!.sunriseFormatted,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 30),
+                            Container(
+                              width: 150,
+                              height: 50,
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: HexColor('#5f6464'),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset('assets/low_temp.png', scale: 15),
+                                  Text(
+                                    w!.temp_min,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 25,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // Sunset Container (example)
+                        Column(
+                          children: [
+                            Container(
+                              width: 150,
+                              height: 50,
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: HexColor('#5f6464'),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.nights_stay,
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    w!.sunsetFormatted, // Add formatted time if needed
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 30),
+                            Container(
+                              width: 150,
+                              height: 50,
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: HexColor('#5f6464'),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    'assets/high_temp.png',
+                                    // scale: 15,
+                                    height: 50,
+                                  ),
+                                  Text(
+                                    w!.temp_max,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 25,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -111,3 +235,11 @@ class _HomeState extends State<Home> {
     );
   }
 }
+
+// Text(
+// w!.main,
+// style: TextStyle(
+// color: Colors.white,
+// fontSize: 40,
+// ),
+// ),
