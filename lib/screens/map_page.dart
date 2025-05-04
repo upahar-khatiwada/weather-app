@@ -17,7 +17,7 @@ class _MapPageState extends State<MapPage> {
   final LatLng? _currentLocation = LatLng(locatedLatitude!, locatedLongitude!);
 
   // For getting the tapped location
-  // LatLng? _selectedLocation;
+  LatLng? _selectedLocation;
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +40,7 @@ class _MapPageState extends State<MapPage> {
             icon: Icon(Icons.check, color: Colors.white),
             onPressed: () {
               if (city != null) {
+                // Pops back the selected city gotten from locator.dart to home.dart
                 Navigator.pop(context, city); // send selected city back
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -61,14 +62,19 @@ class _MapPageState extends State<MapPage> {
               initialCenter: _currentLocation ?? LatLng(0, 0),
               onTap: (TapPosition, latlng) async {
                 setState(() {
-                  // _selectedLocation = latlng;
+                  _selectedLocation = latlng;
                   locatedLatitude = latlng.latitude;
                   locatedLongitude = latlng.longitude;
                   // getLocation();
                 });
+                // gets the tapped city from the coordinates
                 city = await getCityFromCoordinates(
                   latlng.latitude,
                   latlng.longitude,
+                );
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('The tapped city: $city')),
                 );
                 // TapPosition returns screen coordinates while latlng returns actual latitude and longitudes
                 // print("Tapped: ${latlng.latitude}, ${latlng.longitude}");
@@ -87,6 +93,23 @@ class _MapPageState extends State<MapPage> {
                   markerDirection: MarkerDirection.heading,
                 ),
               ),
+              MarkerLayer(
+                markers:
+                    _selectedLocation != null
+                        ? [
+                          Marker(
+                            width: 80,
+                            height: 80,
+                            point: _selectedLocation!,
+                            child: Icon(
+                              Icons.location_on,
+                              color: Colors.red,
+                              size: 40,
+                            ),
+                          ),
+                        ]
+                        : [],
+              ),
             ],
           ),
         ],
@@ -95,7 +118,13 @@ class _MapPageState extends State<MapPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           if (_currentLocation != null) {
-            _mapController.move(_currentLocation!, 10);
+            // Code for debugging, use async function to get the current location
+            // final temp = await getCityFromCoordinates(
+            //   _currentLocation.latitude,
+            //   _currentLocation.longitude,
+            // );
+            // print(temp);
+            _mapController.move(_currentLocation, 10);
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Failed to get the Location')),
