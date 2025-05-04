@@ -10,7 +10,8 @@ String getJSON(String? mainCondition) {
     case 'rain':
     case 'drizzle':
     case 'shower rain':
-      return 'assets/rainy.json';
+      return 'assets/rainy_blue.json';
+    // return 'assets/sun_rain.json';
     case 'snow':
       return 'assets/snow.json';
     case 'thunderstorm':

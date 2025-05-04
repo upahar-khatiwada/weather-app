@@ -1,7 +1,9 @@
 import 'package:geolocator/geolocator.dart';
-import 'dart:convert';
 import 'package:geocoding/geocoding.dart';
 
+double? locatedLatitude, locatedLongitude;
+late List<Placemark> placemarks;
+late String? city;
 Future<String> getLocation() async {
   LocationPermission permission = await Geolocator.checkPermission();
 
@@ -29,9 +31,18 @@ Future<String> getLocation() async {
     position.longitude,
   );
 
-  String? city = placemarks[0].locality;
+  // Not needed anymore as we tracked user's live position in map.dart
+  locatedLatitude = position.latitude;
+  locatedLongitude = position.longitude;
+
+  city = placemarks[0].locality;
   print(city);
 
   return city ?? "";
   // return 'kathmandu';
+}
+
+Future<String> getCityFromCoordinates(double lat, double lon) async {
+  List<Placemark> placemarks = await placemarkFromCoordinates(lat, lon);
+  return placemarks[0].locality ?? "";
 }

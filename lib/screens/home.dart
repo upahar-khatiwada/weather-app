@@ -71,9 +71,29 @@ class _HomeState extends State<Home> {
                   children: [
                     SizedBox(height: 30),
                     ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/map');
+                      onPressed: () async {
+                        // Navigator.pushNamed(context, '/map');
+
+                        final selectedCity = await Navigator.pushNamed(
+                          context,
+                          '/map',
+                        );
+
+                        if (selectedCity != null && selectedCity is String) {
+                          try {
+                            Weather weather = Weather(cityName: selectedCity);
+                            await weather.getWeather();
+                            setState(() {
+                              w = weather;
+                            });
+                          } catch (e) {
+                            print(
+                              'Error while fetching weather after selecting city: $e',
+                            );
+                          }
+                        }
                       },
+
                       label: Text(
                         'Edit Location',
                         style: TextStyle(color: Colors.black, fontSize: 18),
@@ -86,7 +106,7 @@ class _HomeState extends State<Home> {
                       ),
                     ),
                     Container(
-                      margin: EdgeInsets.only(top: 10),
+                      margin: EdgeInsets.only(top: 5),
                       child: Center(
                         child: Text(
                           capitalize(w!.cityName),
