@@ -1,10 +1,10 @@
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
-import 'package:hexcolor/hexcolor.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:weather_app/services/locator.dart';
-import 'package:elegant_notification/elegant_notification.dart';
+import 'package:weather_app/screens/home.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -24,29 +24,48 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
+        iconTheme: IconThemeData(
+          color: isLightMode ? Colors.black : Colors.white,
+        ),
+        title: Text(
           'Select Location',
           style: TextStyle(
-            color: Colors.white,
+            color: isLightMode ? Colors.black : Colors.white,
             fontWeight: FontWeight.bold,
             fontSize: 25,
           ),
         ),
         elevation: 0,
-        shadowColor: Colors.black,
+        shadowColor: isLightMode ? Colors.white : Colors.black,
         centerTitle: true,
-        backgroundColor: HexColor('#5f6464'),
+        backgroundColor: isLightMode ? lightAPP : darkAPP,
         actions: [
           IconButton(
-            icon: Icon(Icons.check, color: Colors.white),
+            icon: Icon(
+              Icons.check,
+              color: isLightMode ? Colors.black : Colors.white,
+            ),
             onPressed: () {
               if (city != null) {
                 // Pops back the selected city gotten from locator.dart to home.dart
                 Navigator.pop(context, city); // send selected city back
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Please tap on a location first")),
-                );
+                // ScaffoldMessenger.of(context).showSnackBar(
+                //   SnackBar(content: Text("Please tap on a location first")),
+                // );
+                Flushbar(
+                  message: 'Please tap on a location first!',
+                  margin: EdgeInsets.all(10),
+                  borderRadius: BorderRadius.circular(8),
+                  backgroundColor: Colors.red,
+                  duration: Duration(seconds: 3),
+                  flushbarPosition:
+                      FlushbarPosition.BOTTOM, // Shows at the bottom
+                  flushbarStyle: FlushbarStyle.FLOATING, // Floats over the UI
+                  forwardAnimationCurve: Curves.easeOut,
+                  reverseAnimationCurve: Curves.easeIn,
+                  icon: Icon(Icons.check_circle, color: Colors.white),
+                ).show(context);
               }
             },
           ),
@@ -69,14 +88,46 @@ class _MapPageState extends State<MapPage> {
                   // getLocation();
                 });
                 // gets the tapped city from the coordinates
-                city = await getCityFromCoordinates(
+                final tappedCity = await getCityFromCoordinates(
                   latlng.latitude,
                   latlng.longitude,
                 );
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('The tapped city: $city')),
-                );
+                if (tappedCity == null || tappedCity.isEmpty) {
+                  Flushbar(
+                    message: 'Could not find a city here!',
+                    margin: EdgeInsets.all(10),
+                    borderRadius: BorderRadius.circular(8),
+                    backgroundColor: Colors.red,
+                    duration: Duration(seconds: 3),
+                    flushbarPosition:
+                        FlushbarPosition.BOTTOM, // Shows at the bottom
+                    flushbarStyle: FlushbarStyle.FLOATING, // Floats over the UI
+                    forwardAnimationCurve: Curves.easeOut,
+                    reverseAnimationCurve: Curves.easeIn,
+                    icon: Icon(Icons.check_circle, color: Colors.white),
+                  ).show(context);
+                  city = "";
+                } else {
+                  city = tappedCity;
+                  // ScaffoldMessenger.of(context).showSnackBar(
+                  //   SnackBar(content: Text('The tapped city: ${city}')),
+                  // );
+                  Flushbar(
+                    message: 'The tapped City: $city',
+                    margin: EdgeInsets.all(10),
+                    borderRadius: BorderRadius.circular(8),
+                    backgroundColor: Colors.green,
+                    duration: Duration(seconds: 3),
+                    flushbarPosition:
+                        FlushbarPosition.BOTTOM, // Shows at the bottom
+                    flushbarStyle: FlushbarStyle.FLOATING, // Floats over the UI
+                    forwardAnimationCurve: Curves.easeOut,
+                    reverseAnimationCurve: Curves.easeIn,
+                    icon: Icon(Icons.check_circle, color: Colors.white),
+                  ).show(context);
+                  // print('The tapped city: ${city.runtimeType}');
+                }
                 // TapPosition returns screen coordinates while latlng returns actual latitude and longitudes
                 // print("Tapped: ${latlng.latitude}, ${latlng.longitude}");
               },
@@ -88,7 +139,10 @@ class _MapPageState extends State<MapPage> {
               CurrentLocationLayer(
                 style: LocationMarkerStyle(
                   marker: DefaultLocationMarker(
-                    child: Icon(Icons.location_pin, color: Colors.white),
+                    child: Icon(
+                      Icons.location_pin,
+                      color: isLightMode ? Colors.black : Colors.white,
+                    ),
                   ),
                   markerSize: Size(34, 34),
                   markerDirection: MarkerDirection.heading,
@@ -132,8 +186,11 @@ class _MapPageState extends State<MapPage> {
             );
           }
         },
-        backgroundColor: HexColor('#5f6464'),
-        child: Icon(Icons.my_location, color: Colors.white),
+        backgroundColor: isLightMode ? lightAPP : darkAPP,
+        child: Icon(
+          Icons.my_location,
+          color: isLightMode ? Colors.black : Colors.white,
+        ),
       ),
     );
   }

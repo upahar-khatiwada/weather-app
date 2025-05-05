@@ -37,7 +37,7 @@ dependencies:
   flutter_map: ^8.1.0
   flutter_map_location_marker: ^10.1.0
   latlng: ^2.0.7
-  elegant_notification: ^2.5.0
+  another_flushbar: ^1.10.24
 
 dev_dependencies:
   flutter_test:

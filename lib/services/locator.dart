@@ -42,6 +42,8 @@ Future<String> getLocation() async {
   // return 'kathmandu';
 }
 
+// Function to return the city's name from latitude, longitude obtained by tapping on the map
+
 Future<String> getCityFromCoordinates(double lat, double lon) async {
   List<Placemark> placemarks = await placemarkFromCoordinates(lat, lon);
   return placemarks[0].locality ?? "";
