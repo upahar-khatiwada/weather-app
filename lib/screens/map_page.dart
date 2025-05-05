@@ -5,6 +5,8 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:weather_app/services/locator.dart';
 import 'package:weather_app/screens/home.dart';
+import 'package:http/http.dart';
+import 'dart:convert';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -17,8 +19,54 @@ class _MapPageState extends State<MapPage> {
   final MapController _mapController = MapController();
   final LatLng? _currentLocation = LatLng(locatedLatitude!, locatedLongitude!);
 
+  // For the search bar
+  final TextEditingController _locationController = TextEditingController();
+
   // For getting the tapped location
   LatLng? _selectedLocation;
+
+  // Function for search Bar
+  Future<void> fetchLocationFromCoordinates(searchedLocation_) async {
+    try {
+      Response response = await get(
+        Uri.parse(
+          'https://nominatim.openstreetmap.org/search?q=$searchedLocation_&format=json&limit=1',
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        // Couldn't use Map since it returned a list with the error message:
+        // type 'List<dynamic>' is not a subtype of type 'Map<dynamic, dynamic>'
+        final List<dynamic> searchedLocationData = json.decode(response.body);
+        // print(searchedLocationData);
+        if (searchedLocationData.isNotEmpty) {
+          print(searchedLocationData);
+          setState(() {
+            _selectedLocation = LatLng(
+              searchedLocationData[0]['lat'],
+              searchedLocationData[0]['lon'],
+            );
+          });
+        }
+      } else {
+        print('STATUS CODE NOT 200');
+      }
+    } catch (e) {
+      print(e);
+      Flushbar(
+        message: 'Error while searching: $e',
+        margin: EdgeInsets.all(10),
+        borderRadius: BorderRadius.circular(8),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
+        flushbarPosition: FlushbarPosition.BOTTOM, // Shows at the bottom
+        flushbarStyle: FlushbarStyle.FLOATING, // Floats over the UI
+        forwardAnimationCurve: Curves.easeOut,
+        reverseAnimationCurve: Curves.easeIn,
+        icon: Icon(Icons.check_circle, color: Colors.white),
+      ).show(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -166,6 +214,63 @@ class _MapPageState extends State<MapPage> {
                         : [],
               ),
             ],
+          ),
+          Positioned(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _locationController,
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: isLightMode ? darkAPP : Colors.white,
+                        hintText: "Enter a valid location:",
+                        hintStyle: TextStyle(
+                          color: isLightMode ? Colors.white : Colors.black,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    style: IconButton.styleFrom(
+                      backgroundColor: isLightMode ? darkAPP : Colors.white,
+                    ),
+                    onPressed: () {
+                      final searchedLocation = _locationController.text.trim();
+                      if (searchedLocation.isNotEmpty) {
+                        fetchLocationFromCoordinates(searchedLocation);
+                        _mapController.move(_selectedLocation!, 13);
+                      } else {
+                        Flushbar(
+                          message: 'Could not find the searched location',
+                          margin: EdgeInsets.all(10),
+                          borderRadius: BorderRadius.circular(8),
+                          backgroundColor: Colors.red,
+                          duration: Duration(seconds: 3),
+                          flushbarPosition:
+                              FlushbarPosition.BOTTOM, // Shows at the bottom
+                          flushbarStyle:
+                              FlushbarStyle.FLOATING, // Floats over the UI
+                          forwardAnimationCurve: Curves.easeOut,
+                          reverseAnimationCurve: Curves.easeIn,
+                          icon: Icon(Icons.check_circle, color: Colors.white),
+                        ).show(context);
+                      }
+                    },
+                    icon: const Icon(Icons.search),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),

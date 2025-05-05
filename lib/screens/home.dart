@@ -86,7 +86,6 @@ class _HomeState extends State<Home> {
       ),
       drawer: SideBar(onThemeChanged: () => setState(() {})),
       backgroundColor: isLightMode ? lightBG : darkBG,
-      // backgroundColor: Colors.white,
       body: SafeArea(
         child:
             w == null

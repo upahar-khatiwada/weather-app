@@ -14,7 +14,7 @@ class Weather {
       Uri.parse('$baseUrl?q=$cityName&appid=$apiKey&units=metric'),
     );
     Map data = jsonDecode(response.body);
-    print(data);
+    // print(data);
     // print(data['main']['temp']);
     // print(data['main']['pressure']);
     // print(data['main']['humidity']);
