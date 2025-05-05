@@ -4,6 +4,7 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:weather_app/services/locator.dart';
+import 'package:elegant_notification/elegant_notification.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -124,7 +125,7 @@ class _MapPageState extends State<MapPage> {
             //   _currentLocation.longitude,
             // );
             // print(temp);
-            _mapController.move(_currentLocation, 10);
+            _mapController.move(_currentLocation, 7);
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Failed to get the Location')),

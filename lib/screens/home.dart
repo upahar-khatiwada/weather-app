@@ -7,6 +7,8 @@ import 'package:lottie/lottie.dart';
 import 'package:weather_app/services/Capitalizer.dart';
 import 'package:weather_app/services/animation_selector.dart';
 
+bool isDarkMode = true;
+
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -43,6 +45,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        iconTheme: IconThemeData(color: Colors.white),
         title: const Text(
           'Weather App',
           style: TextStyle(
@@ -59,6 +62,7 @@ class _HomeState extends State<Home> {
         centerTitle: true,
         backgroundColor: HexColor('#5f6464'),
       ),
+      drawer: SideBar(),
       backgroundColor: HexColor('#1d1e1e'),
       // backgroundColor: Colors.white,
       body: SafeArea(
@@ -263,3 +267,80 @@ class _HomeState extends State<Home> {
 // fontSize: 40,
 // ),
 // ),
+
+class SideBar extends StatelessWidget {
+  const SideBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [buildHeader(context), buildMenuItems(context)],
+        ),
+      ),
+    );
+  }
+}
+
+Widget buildHeader(BuildContext context) => Container(
+  color: HexColor('#5f6464'),
+  padding: const EdgeInsets.only(top: 60, bottom: 20),
+  child: Column(
+    children: [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.settings, color: Colors.white, size: 33),
+          SizedBox(width: 7),
+          Text(
+            'Settings',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 30,
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: 10),
+    ],
+  ),
+);
+
+Widget buildMenuItems(BuildContext context) => Container(
+  color: HexColor('#1d1e1e'),
+  height: MediaQuery.of(context).size.height,
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      SizedBox(height: 10.0),
+      Material(
+        color: HexColor('#1d1e1e'),
+        child: InkWell(
+          onTap: () {
+            // Handle tap
+          },
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Row(
+              children: [
+                Icon(Icons.light_mode, color: Colors.white),
+                SizedBox(width: 10),
+                Text(
+                  'Light Mode',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ],
+  ),
+);
