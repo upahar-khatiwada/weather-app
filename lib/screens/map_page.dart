@@ -45,7 +45,7 @@ class _MapPageState extends State<MapPage> {
     if (response.statusCode == 200) {
       // This API returns a dynamic list not a map
       final List<dynamic> searchedLocationData = json.decode(response.body);
-      print(searchedLocationData);
+      // print(searchedLocationData);
 
       if (searchedLocationData.isNotEmpty) {
         // The runtime type is String hence parsing needed!
