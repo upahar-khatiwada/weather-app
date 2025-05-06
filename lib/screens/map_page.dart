@@ -44,11 +44,37 @@ class _MapPageState extends State<MapPage> {
       final List<dynamic> searchedLocationData = json.decode(response.body);
       print(searchedLocationData);
 
-      // The runtime type is String hence parsing needed!
-      final searchedLatitude = double.parse(searchedLocationData[0]['lat']);
-      final searchedLongitude = double.parse(searchedLocationData[0]['lon']);
+      if (searchedLocationData.isNotEmpty) {
+        // The runtime type is String hence parsing needed!
+        final searchedLatitude = double.parse(searchedLocationData[0]['lat']);
+        final searchedLongitude = double.parse(searchedLocationData[0]['lon']);
 
-      _mapController.move(LatLng(searchedLatitude, searchedLongitude), 7);
+        _mapController.move(LatLng(searchedLatitude, searchedLongitude), 7);
+      } else {
+        Flushbar(
+          message: 'Could not search the city!',
+          margin: EdgeInsets.all(10),
+          borderRadius: BorderRadius.circular(8),
+          backgroundColor: Colors.red,
+          flushbarPosition: FlushbarPosition.BOTTOM,
+          flushbarStyle: FlushbarStyle.FLOATING,
+          forwardAnimationCurve: Curves.easeOut,
+          reverseAnimationCurve: Curves.easeIn,
+          icon: Icon(Icons.cancel, color: Colors.white),
+        ).show(context);
+      }
+    } else {
+      Flushbar(
+        message: 'Could not search the city!',
+        margin: EdgeInsets.all(10),
+        borderRadius: BorderRadius.circular(8),
+        backgroundColor: Colors.red,
+        flushbarPosition: FlushbarPosition.BOTTOM,
+        flushbarStyle: FlushbarStyle.FLOATING,
+        forwardAnimationCurve: Curves.easeOut,
+        reverseAnimationCurve: Curves.easeIn,
+        icon: Icon(Icons.cancel, color: Colors.white),
+      ).show(context);
     }
   }
 
@@ -96,7 +122,7 @@ class _MapPageState extends State<MapPage> {
                   flushbarStyle: FlushbarStyle.FLOATING, // Floats over the UI
                   forwardAnimationCurve: Curves.easeOut,
                   reverseAnimationCurve: Curves.easeIn,
-                  icon: Icon(Icons.check_circle, color: Colors.white),
+                  icon: Icon(Icons.cancel, color: Colors.white),
                 ).show(context);
               }
             },
@@ -140,7 +166,7 @@ class _MapPageState extends State<MapPage> {
                     flushbarStyle: FlushbarStyle.FLOATING, // Floats over the UI
                     forwardAnimationCurve: Curves.easeOut,
                     reverseAnimationCurve: Curves.easeIn,
-                    icon: Icon(Icons.check_circle, color: Colors.white),
+                    icon: Icon(Icons.cancel, color: Colors.white),
                   ).show(context);
                   city = "";
                 } else {
@@ -269,7 +295,7 @@ class _MapPageState extends State<MapPage> {
               flushbarStyle: FlushbarStyle.FLOATING, // Floats over the UI
               forwardAnimationCurve: Curves.easeOut,
               reverseAnimationCurve: Curves.easeIn,
-              icon: Icon(Icons.check_circle, color: Colors.white),
+              icon: Icon(Icons.cancel, color: Colors.white),
             ).show(context);
             // ScaffoldMessenger.of(context).showSnackBar(
             //   SnackBar(content: Text('Failed to get the Location')),
