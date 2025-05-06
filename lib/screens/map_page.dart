@@ -19,6 +19,9 @@ class _MapPageState extends State<MapPage> {
   final MapController _mapController = MapController();
   LatLng? _currentLocation;
 
+  // For search suggestions
+  // List<String> searchSuggestions = [];
+
   // For the search bar
   final TextEditingController _locationTextController = TextEditingController();
 
@@ -52,7 +55,7 @@ class _MapPageState extends State<MapPage> {
         _mapController.move(LatLng(searchedLatitude, searchedLongitude), 7);
       } else {
         Flushbar(
-          message: 'Could not search the city!',
+          message: 'City not found. Try again!',
           margin: EdgeInsets.all(10),
           borderRadius: BorderRadius.circular(8),
           backgroundColor: Colors.red,
@@ -61,6 +64,7 @@ class _MapPageState extends State<MapPage> {
           forwardAnimationCurve: Curves.easeOut,
           reverseAnimationCurve: Curves.easeIn,
           icon: Icon(Icons.cancel, color: Colors.white),
+          duration: Duration(seconds: 3),
         ).show(context);
       }
     } else {
@@ -74,9 +78,25 @@ class _MapPageState extends State<MapPage> {
         forwardAnimationCurve: Curves.easeOut,
         reverseAnimationCurve: Curves.easeIn,
         icon: Icon(Icons.cancel, color: Colors.white),
+        duration: Duration(seconds: 3),
       ).show(context);
     }
   }
+
+  // Future<void> fetchSearchSuggestions(String val) async {
+  //   Response response = await get(
+  //     Uri.parse(
+  //       'https://nominatim.openstreetmap.org/search?q=$val&format=json&limit=5',
+  //     ),
+  //   );
+  //   if (response.statusCode == 200) {
+  //     List<dynamic> data = json.decode(response.body);
+  //     setState(() {
+  //       searchSuggestions =
+  //           data.map<String>((item) => item['display_name'] as String).toList();
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +124,7 @@ class _MapPageState extends State<MapPage> {
               color: isLightMode ? Colors.black : Colors.white,
             ),
             onPressed: () {
-              if (city != null || city == '') {
+              if (city != null && city != '') {
                 // Pops back the selected city gotten from locator.dart to home.dart
                 Navigator.pop(context, city); // send selected city back
               } else {
@@ -251,6 +271,15 @@ class _MapPageState extends State<MapPage> {
                           horizontal: 20,
                         ),
                       ),
+                      // onChanged: (value) {
+                      //   if (value.trim().isNotEmpty) {
+                      //     fetchSearchSuggestions(value.trim());
+                      //   } else {
+                      //     setState(() {
+                      //       searchSuggestions = [];
+                      //     });
+                      //   }
+                      // },
                     ),
                   ),
                   IconButton(
@@ -271,6 +300,34 @@ class _MapPageState extends State<MapPage> {
               ),
             ),
           ),
+          // if (searchSuggestions.isNotEmpty)
+          // Container(
+          //   margin: EdgeInsets.only(top: 5),
+          //   decoration: BoxDecoration(
+          //     color: isLightMode ? Colors.white : Colors.blueGrey,
+          //     borderRadius: BorderRadius.circular(10),
+          //   ),
+          //   child: ListView.builder(
+          //     shrinkWrap: true,
+          //     itemCount: searchSuggestions.length,
+          //     itemBuilder: (context, index) {
+          //       return ListTile(
+          //         title: Text(
+          //           searchSuggestions[index],
+          //           style: TextStyle(
+          //             color: isLightMode ? Colors.black : Colors.white,
+          //           ),
+          //         ),
+          //         onTap: () {
+          //           _locationTextController.text = searchSuggestions[index];
+          //           searchSuggestions = [];
+          //           getCoordinatesFromCityName(_locationTextController.text);
+          //           setState(() {});
+          //         },
+          //       );
+          //     },
+          //   ),
+          // ),
         ],
       ),
       // To get back to current location
