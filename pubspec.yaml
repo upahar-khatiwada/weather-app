@@ -38,6 +38,7 @@ dependencies:
   flutter_map_location_marker: ^10.1.0
   latlng: ^2.0.7
   another_flushbar: ^1.10.24
+  searchfield: ^1.2.9
 
 dev_dependencies:
   flutter_test:

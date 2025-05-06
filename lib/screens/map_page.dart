@@ -17,54 +17,38 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   final MapController _mapController = MapController();
-  final LatLng? _currentLocation = LatLng(locatedLatitude!, locatedLongitude!);
+  LatLng? _currentLocation;
 
   // For the search bar
-  final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _locationTextController = TextEditingController();
 
-  // For getting the tapped location
+  // For getting the tapped location, contains latitude and longitude of the tapped place
   LatLng? _selectedLocation;
 
-  // Function for search Bar
-  Future<void> fetchLocationFromCoordinates(searchedLocation_) async {
-    try {
-      Response response = await get(
-        Uri.parse(
-          'https://nominatim.openstreetmap.org/search?q=$searchedLocation_&format=json&limit=1',
-        ),
-      );
+  @override
+  void initState() {
+    super.initState();
+    _currentLocation = LatLng(locatedLatitude!, locatedLongitude!);
+  }
 
-      if (response.statusCode == 200) {
-        // Couldn't use Map since it returned a list with the error message:
-        // type 'List<dynamic>' is not a subtype of type 'Map<dynamic, dynamic>'
-        final List<dynamic> searchedLocationData = json.decode(response.body);
-        // print(searchedLocationData);
-        if (searchedLocationData.isNotEmpty) {
-          print(searchedLocationData);
-          setState(() {
-            _selectedLocation = LatLng(
-              searchedLocationData[0]['lat'],
-              searchedLocationData[0]['lon'],
-            );
-          });
-        }
-      } else {
-        print('STATUS CODE NOT 200');
-      }
-    } catch (e) {
-      print(e);
-      Flushbar(
-        message: 'Error while searching: $e',
-        margin: EdgeInsets.all(10),
-        borderRadius: BorderRadius.circular(8),
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 3),
-        flushbarPosition: FlushbarPosition.BOTTOM, // Shows at the bottom
-        flushbarStyle: FlushbarStyle.FLOATING, // Floats over the UI
-        forwardAnimationCurve: Curves.easeOut,
-        reverseAnimationCurve: Curves.easeIn,
-        icon: Icon(Icons.check_circle, color: Colors.white),
-      ).show(context);
+  // Function for search Bar
+  Future<void> getCoordinatesFromCityName(searched_city) async {
+    Response response = await get(
+      Uri.parse(
+        'https://nominatim.openstreetmap.org/search?q=$searched_city&format=json&limit=1',
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      // This API returns a dynamic list not a map
+      final List<dynamic> searchedLocationData = json.decode(response.body);
+      print(searchedLocationData);
+
+      // The runtime type is String hence parsing needed!
+      final searchedLatitude = double.parse(searchedLocationData[0]['lat']);
+      final searchedLongitude = double.parse(searchedLocationData[0]['lon']);
+
+      _mapController.move(LatLng(searchedLatitude, searchedLongitude), 7);
     }
   }
 
@@ -94,7 +78,7 @@ class _MapPageState extends State<MapPage> {
               color: isLightMode ? Colors.black : Colors.white,
             ),
             onPressed: () {
-              if (city != null) {
+              if (city != null || city == '') {
                 // Pops back the selected city gotten from locator.dart to home.dart
                 Navigator.pop(context, city); // send selected city back
               } else {
@@ -122,17 +106,20 @@ class _MapPageState extends State<MapPage> {
       body: Stack(
         children: [
           FlutterMap(
-            mapController: _mapController,
+            mapController: _mapController, // Controls the map's movement
             options: MapOptions(
               initialZoom: 2,
               minZoom: 0,
               maxZoom: 100,
-              initialCenter: _currentLocation ?? LatLng(0, 0),
+              initialCenter:
+                  _currentLocation ??
+                  LatLng(27.70, 85.32), //default centre kathmandu
               onTap: (TapPosition, latlng) async {
                 setState(() {
-                  _selectedLocation = latlng;
-                  locatedLatitude = latlng.latitude;
-                  locatedLongitude = latlng.longitude;
+                  _selectedLocation =
+                      latlng; //latlng is the tapped latitude/longitude
+                  // locatedLatitude = latlng.latitude;
+                  // locatedLongitude = latlng.longitude;
                   // getLocation();
                 });
                 // gets the tapped city from the coordinates
@@ -141,7 +128,7 @@ class _MapPageState extends State<MapPage> {
                   latlng.longitude,
                 );
 
-                if (tappedCity == null || tappedCity.isEmpty) {
+                if (tappedCity.isEmpty) {
                   Flushbar(
                     message: 'Could not find a city here!',
                     margin: EdgeInsets.all(10),
@@ -222,7 +209,7 @@ class _MapPageState extends State<MapPage> {
                 children: [
                   Expanded(
                     child: TextField(
-                      controller: _locationController,
+                      controller: _locationTextController,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: isLightMode ? darkAPP : Colors.white,
@@ -245,28 +232,14 @@ class _MapPageState extends State<MapPage> {
                       backgroundColor: isLightMode ? darkAPP : Colors.white,
                     ),
                     onPressed: () {
-                      final searchedLocation = _locationController.text.trim();
-                      if (searchedLocation.isNotEmpty) {
-                        fetchLocationFromCoordinates(searchedLocation);
-                        _mapController.move(_selectedLocation!, 13);
-                      } else {
-                        Flushbar(
-                          message: 'Could not find the searched location',
-                          margin: EdgeInsets.all(10),
-                          borderRadius: BorderRadius.circular(8),
-                          backgroundColor: Colors.red,
-                          duration: Duration(seconds: 3),
-                          flushbarPosition:
-                              FlushbarPosition.BOTTOM, // Shows at the bottom
-                          flushbarStyle:
-                              FlushbarStyle.FLOATING, // Floats over the UI
-                          forwardAnimationCurve: Curves.easeOut,
-                          reverseAnimationCurve: Curves.easeIn,
-                          icon: Icon(Icons.check_circle, color: Colors.white),
-                        ).show(context);
-                      }
+                      final searchedLocation =
+                          _locationTextController.text.trim();
+                      getCoordinatesFromCityName(searchedLocation);
                     },
-                    icon: const Icon(Icons.search),
+                    icon: Icon(
+                      Icons.search,
+                      color: isLightMode ? Colors.white : Colors.black,
+                    ),
                   ),
                 ],
               ),
@@ -284,11 +257,23 @@ class _MapPageState extends State<MapPage> {
             //   _currentLocation.longitude,
             // );
             // print(temp);
-            _mapController.move(_currentLocation, 7);
+            _mapController.move(_currentLocation!, 7);
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Failed to get the Location')),
-            );
+            Flushbar(
+              message: 'Could not get the Location!',
+              margin: EdgeInsets.all(10),
+              borderRadius: BorderRadius.circular(8),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 3),
+              flushbarPosition: FlushbarPosition.BOTTOM, // Shows at the bottom
+              flushbarStyle: FlushbarStyle.FLOATING, // Floats over the UI
+              forwardAnimationCurve: Curves.easeOut,
+              reverseAnimationCurve: Curves.easeIn,
+              icon: Icon(Icons.check_circle, color: Colors.white),
+            ).show(context);
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   SnackBar(content: Text('Failed to get the Location')),
+            // );
           }
         },
         backgroundColor: isLightMode ? lightAPP : darkAPP,

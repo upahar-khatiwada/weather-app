@@ -38,7 +38,7 @@ Future<String> getLocation() async {
   city = placemarks[0].locality;
   // print(city);
 
-  return city ?? "";
+  return city ?? '';
   // return 'kathmandu';
 }
 
