@@ -2,6 +2,7 @@ import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:weather_app/services/weather_model.dart';
 import 'package:weather_app/services/locator.dart';
 import 'package:lottie/lottie.dart';
@@ -25,12 +26,14 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final themeBox = Hive.box('db_theme');
   // w is an object to get the weather data
   Weather? w;
 
   @override
   void initState() {
     super.initState();
+    isLightMode = themeBox.get("theme", defaultValue: false);
     getWeather();
   }
 
@@ -84,7 +87,10 @@ class _HomeState extends State<Home> {
         centerTitle: true,
         backgroundColor: isLightMode ? lightAPP : darkAPP,
       ),
-      drawer: SideBar(onThemeChanged: () => setState(() {})),
+      drawer: SideBar(
+        onThemeChanged: () => setState(() {}),
+        themeBox: themeBox,
+      ),
       backgroundColor: isLightMode ? lightBG : darkBG,
       body: SafeArea(
         child:
@@ -341,13 +347,24 @@ class _HomeState extends State<Home> {
 
 class SideBar extends StatefulWidget {
   final VoidCallback onThemeChanged;
-  const SideBar({super.key, required this.onThemeChanged});
+  final themeBox;
+  const SideBar({super.key, required this.onThemeChanged, this.themeBox});
 
   @override
   State<SideBar> createState() => _SideBarState();
 }
 
 class _SideBarState extends State<SideBar> {
+  void putTheme() {
+    widget.themeBox.put("theme", isLightMode);
+  }
+
+  void getTheme() {
+    setState(() {
+      isLightMode = widget.themeBox.get("theme");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -427,6 +444,7 @@ class _SideBarState extends State<SideBar> {
                       setState(() {
                         // your state update code
                         isLightMode = val;
+                        widget.themeBox.put("theme", isLightMode);
                       });
                       widget.onThemeChanged();
                     },
